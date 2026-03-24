@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Sync</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FAF8F3;
+    --ink: #1A1916;
+    --ink-muted: #6B6860;
+    --ink-faint: #C4C1B8;
+    --accent: #E8533A;
+    --accent-light: #FDF0ED;
+    --green: #2D7A5A;
+    --green-light: #EAF4EE;
+    --amber: #D4850A;
+    --amber-light: #FDF5E6;
+    --border: #E8E5DE;
+    --card: #FFFFFF;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-logo span {
+    width: 24px;
+    height: 24px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .nav-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* BUTTONS */
+  .btn {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-primary {
+    background: var(--ink);
+    color: white;
+  }
+  .btn-primary:hover { background: #333; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink-muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--cream); color: var(--ink); }
+
+  .btn-accent {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-accent:hover { background: #d44a32; }
+
+  /* LAYOUT */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem;
+  }
+
+  /* VIEWS */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* === HOME VIEW === */
+  .home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .home-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .home-subtitle {
+    color: var(--ink-muted);
+    font-size: 14px;
+    margin-top: 4px;
+  }
+
+  /* WEEK CARDS */
+  .weeks-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .week-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .week-card:hover {
+    border-color: var(--ink-faint);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transform: translateY(-1px);
+  }
+
+  .week-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 48px;
+    text-align: center;
+  }
+
+  .week-info {
+    flex: 1;
+  }
+
+  .week-date {
+    font-weight: 500;
+    font-size: 15px;
+  }
+
+  .week-preview {
+    color: var(--ink-muted);
+    font-size: 13px;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 500px;
+  }
+
+  .week-participants {
+    display: flex;
+    gap: 6px;
+  }
+
+  .participant-badge {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    color: var(--ink-muted);
+  }
+
+  .week-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .tag-done { background: var(--green-light); color: var(--green); }
+  .tag-todo { background: var(--amber-light); color: var(--amber); }
+  .tag-hard { background: var(--accent-light); color: var(--accent); }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+    color: var(--ink-muted);
+  }
+
+  .empty-icon {
+    font-size: 40px;
+    margin-bottom: 1rem;
+    opacity: 0.4;
+  }
+
+  .empty-state h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .empty-state p { font-size: 14px; margin-bottom: 1.5rem; }
+
+  /* === FORM VIEW === */
+  .form-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .form-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .form-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+
+  .form-section.full { grid-column: 1 / -1; }
+
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--ink-muted);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-green { background: var(--green); }
+  .dot-amber { background: var(--amber); }
+  .dot-red { background: var(--accent); }
+  .dot-blue { background: #3B78C4; }
+  .dot-purple { background: #7C3AED; }
+  .dot-gray { background: var(--ink-faint); }
+
+  label.field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-muted);
+    margin-bottom: 5px;
+    margin-top: 12px;
+  }
+
+  label.field-label:first-of-type { margin-top: 0; }
+
+  input[type="text"], input[type="date"], textarea, select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--cream);
+    transition: border-color 0.15s;
+    outline: none;
+    resize: vertical;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--ink-faint);
+    background: white;
+  }
+
+  textarea { min-height: 90px; }
+
+  /* PARTICIPANT BLOCKS */
+  .participants-header {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .participant-tab {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink-muted);
+  }
+
+  .participant-tab.active {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: white;
+  }
+
+  /* OBJECTIVES BUILDER */
+  .objectives-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .objective-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+
+  .objective-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--green);
+  }
+
+  .objective-item input[type="text"] {
+    border: none;
+    background: transparent;
+    padding: 0;
+    flex: 1;
+    font-size: 14px;
+  }
+
+  .objective-item input[type="text"]:focus {
+    background: transparent;
+    border: none;
+  }
+
+  .obj-delete {
+    background: none;
+    border: none;
+    color: var(--ink-faint);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 2px;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+
+  .obj-delete:hover { color: var(--accent); }
+
+  .add-obj-btn {
+    background: none;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--ink-muted);
+    width: 100%;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .add-obj-btn:hover { border-color: var(--ink-faint); color: var(--ink); background: var(--cream); }
+
+  /* FORM FOOTER */
+  .form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  /* === DETAIL VIEW === */
+  .detail-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .detail-week-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .detail-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .detail-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+
+  .detail-card.full { grid-column: 1 / -1; }
+
+  .detail-card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--ink-muted);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .detail-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink);
+    white-space: pre-wrap;
+  }
+
+  .detail-text.empty { color: var(--ink-faint); font-style: italic; }
+
+  .obj-list-detail {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .obj-list-detail li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .obj-list-detail li:last-child { border-bottom: none; }
+
+  .obj-status-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .obj-done { background: var(--green-light); color: var(--green); }
+  .obj-pending { background: var(--amber-light); color: var(--amber); }
+
+  .obj-text-done { text-decoration: line-through; color: var(--ink-muted); }
+
+  .participant-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .participant-section:last-child { margin-bottom: 0; }
+
+  .participant-name {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ink-muted);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    display: none;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 2rem;
+    max-width: 440px;
+    width: 100%;
+    border: 1px solid var(--border);
+  }
+
+  .modal h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .modal p { font-size: 14px; color: var(--ink-muted); margin-bottom: 1.5rem; }
+
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* SETTINGS */
+  .settings-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .settings-section h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .form-grid, .detail-grid { grid-template-columns: 1fr; }
+    .form-section.full, .detail-card.full { grid-column: 1; }
+    nav { padding: 0 1rem; }
+    .container { padding: 1.5rem 1rem; }
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 10px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+
+  .week-stats {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-top: 4px;
+  }
+
+  .week-stat { display: flex; align-items: center; gap: 4px; }
+
+  .stat-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Animate in */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .week-card { animation: fadeIn 0.2s ease; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <span>W</span>
+    Weekly Sync
+  </div>
+  <div class="nav-actions">
+    <button class="btn btn-ghost" onclick="showSettings()" title="Paramètres">⚙</button>
+    <button class="btn btn-accent" onclick="showNewForm()">+ Nouvelle semaine</button>
+  </div>
+</nav>
+
+<!-- HOME VIEW -->
+<div id="view-home" class="view active">
+  <div class="container">
+    <div class="home-header">
+      <div>
+        <h1 class="home-title">Nos semaines</h1>
+        <p class="home-subtitle" id="subtitle-text">Chargement...</p>
+      </div>
+    </div>
+    <div class="weeks-grid" id="weeks-list"></div>
+  </div>
+</div>
+
+<!-- FORM VIEW -->
+<div id="view-form" class="view">
+  <div class="container">
+    <div class="form-header">
+      <button class="btn btn-ghost" onclick="showHome()">← Retour</button>
+      <h2 id="form-title">Nouvelle semaine</h2>
+    </div>
+
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 160px;">
+        <label class="field-label">Date de la réunion</label>
+        <input type="date" id="f-date">
+      </div>
+      <div style="flex: 1; min-width: 160px;">
+        <label class="field-label">Numéro de semaine</label>
+        <input type="text" id="f-week-num" placeholder="ex: S42">
+      </div>
+      <div style="flex: 1; min-width: 200px;">
+        <label class="field-label">Humeur générale</label>
+        <select id="f-mood">
+          <option value="">—</option>
+          <option value="🔥 En feu">🔥 En feu</option>
+          <option value="💪 Motivé">💪 Motivé</option>
+          <option value="😐 Neutre">😐 Neutre</option>
+          <option value="😓 Difficile">😓 Difficile</option>
+          <option value="🤯 Overwhelmed">🤯 Overwhelmed</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Tabs participants -->
+    <div class="participants-header">
+      <button class="participant-tab active" id="tab-p1" onclick="switchParticipant(0)">
+        <span id="tab-p1-name">Participant 1</span>
+      </button>
+      <button class="participant-tab" id="tab-p2" onclick="switchParticipant(1)">
+        <span id="tab-p2-name">Participant 2</span>
+      </button>
+    </div>
+
+    <!-- Participant 0 -->
+    <div id="form-p0" class="participant-form">
+      <div class="form-grid">
+        <div class="form-section">
+          <div class="section-label"><div class="section-dot dot-green"></div> Faits cette semaine</div>
+          <textarea id="p0-done" placeholder="Ce que tu as accompli cette semaine..."></textarea>
+        </div>
+        <div class="form-section">
+          <div class="section-label"><div class="section-dot dot-red"></div> Points difficiles</div>
+          <textarea id="p0-hard" placeholder="Ce qui a été compliqué, bloquant..."></textarea>
+        </div>
+        <div class="form-section full">
+          <div class="section-label"><div class="section-dot dot-amber"></div> Objectifs de la semaine passée</div>
+          <div class="objectives-list" id="p0-prev-objs"></div>
+          <button class="add-obj-btn" onclick="addObj('p0-prev', false)">+ Ajouter un objectif</button>
+        </div>
+        <div class="form-section full">
+          <div class="section-label"><div class="section-dot dot-blue"></div> Objectifs pour la semaine prochaine</div>
+          <div class="objectives-list" id="p0-next-objs"></div>
+          <button class="add-obj-btn" onclick="addObj('p0-next', false)">+ Ajouter un objectif</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Participant 1 -->
+    <div id="form-p1" class="participant-form" style="display: none;">
+      <div class="form-grid">
+        <div class="form-section">
+          <div class="section-label"><div class="section-dot dot-green"></div> Faits cette semaine</div>
+          <textarea id="p1-done" placeholder="Ce que tu as accompli cette semaine..."></textarea>
+        </div>
+        <div class="form-section">
+          <div class="section-label"><div class="section-dot dot-red"></div> Points difficiles</div>
+          <textarea id="p1-hard" placeholder="Ce qui a été compliqué, bloquant..."></textarea>
+        </div>
+        <div class="form-section full">
+          <div class="section-label"><div class="section-dot dot-amber"></div> Objectifs de la semaine passée</div>
+          <div class="objectives-list" id="p1-prev-objs"></div>
+          <button class="add-obj-btn" onclick="addObj('p1-prev', false)">+ Ajouter un objectif</button>
+        </div>
+        <div class="form-section full">
+          <div class="section-label"><div class="section-dot dot-blue"></div> Objectifs pour la semaine prochaine</div>
+          <div class="objectives-list" id="p1-next-objs"></div>
+          <button class="add-obj-btn" onclick="addObj('p1-next', false)">+ Ajouter un objectif</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes communes -->
+    <div style="margin-top: 1.5rem;">
+      <div class="form-section full" style="display: block; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem;">
+        <div class="section-label"><div class="section-dot dot-purple"></div> Notes communes</div>
+        <textarea id="f-notes" placeholder="Décisions prises ensemble, idées, prochaines actions communes..." style="min-height: 80px;"></textarea>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <div>
+        <button class="btn btn-ghost" id="delete-btn" onclick="confirmDelete()" style="display:none; color: var(--accent); border-color: var(--accent);">Supprimer</button>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-ghost" onclick="showHome()">Annuler</button>
+        <button class="btn btn-primary" onclick="saveWeek()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL VIEW -->
+<div id="view-detail" class="view">
+  <div class="container">
+    <div class="detail-header">
+      <div>
+        <div class="detail-week-num" id="d-week-num"></div>
+        <h1 class="detail-title" id="d-title"></h1>
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+          <span id="d-mood" style="font-size: 15px;"></span>
+          <span id="d-progress-text" style="font-size: 13px; color: var(--ink-muted);"></span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-ghost" onclick="showHome()">← Retour</button>
+        <button class="btn btn-ghost" onclick="editCurrentWeek()">Modifier</button>
+      </div>
+    </div>
+
+    <div class="detail-grid" id="detail-content"></div>
+  </div>
+</div>
+
+<!-- SETTINGS VIEW -->
+<div id="view-settings" class="view">
+  <div class="container">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+      <button class="btn btn-ghost" onclick="showHome()">← Retour</button>
+      <h2 style="font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700;">Paramètres</h2>
+    </div>
+
+    <div class="settings-section">
+      <h3>Participants</h3>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 180px;">
+          <label class="field-label">Nom du participant 1</label>
+          <input type="text" id="s-name1" placeholder="Ton prénom">
+        </div>
+        <div style="flex: 1; min-width: 180px;">
+          <label class="field-label">Nom du participant 2</label>
+          <input type="text" id="s-name2" placeholder="Prénom de ton ami">
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Données</h3>
+      <p style="font-size: 14px; color: var(--ink-muted); margin-bottom: 1rem;">Les données sont stockées localement dans votre navigateur. Exportez régulièrement pour ne rien perdre.</p>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="btn btn-ghost" onclick="exportData()">📥 Exporter (JSON)</button>
+        <button class="btn btn-ghost" onclick="importData()">📤 Importer (JSON)</button>
+        <button class="btn btn-ghost" style="color: var(--accent); border-color: var(--accent);" onclick="confirmClearAll()">🗑 Tout effacer</button>
+      </div>
+      <input type="file" id="import-file" accept=".json" style="display:none;" onchange="handleImport(event)">
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+      <button class="btn btn-primary" onclick="saveSettings()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Confirmation</h3>
+    <p id="modal-msg"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-accent" id="modal-confirm">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================
+// STATE
+// ============================================
+let db = JSON.parse(localStorage.getItem('weeklysync') || '{"settings":{"name1":"Arnaud","name2":"Maxime"},"weeks":[]}');
+let editingId = null;
+let currentDetailId = null;
+
+function save() {
+  localStorage.setItem('weeklysync', JSON.stringify(db));
+}
+
+function getSettings() { return db.settings || { name1: 'Moi', name2: 'Mon ami' }; }
+
+// ============================================
+// VIEWS
+// ============================================
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showHome() {
+  renderHome();
+  showView('home');
+}
+
+function showSettings() {
+  const s = getSettings();
+  document.getElementById('s-name1').value = s.name1 || '';
+  document.getElementById('s-name2').value = s.name2 || '';
+  showView('settings');
+}
+
+function showNewForm() {
+  editingId = null;
+  resetForm();
+  document.getElementById('form-title').textContent = 'Nouvelle semaine';
+  document.getElementById('delete-btn').style.display = 'none';
+  // Set default date to today
+  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+  // Set week number
+  const wn = getWeekNumber(new Date());
+  document.getElementById('f-week-num').value = 'S' + wn;
+  // Init empty objectives
+  renderObjList('p0-prev', []);
+  renderObjList('p0-next', []);
+  renderObjList('p1-prev', []);
+  renderObjList('p1-next', []);
+  switchParticipant(0);
+  updateTabNames();
+  showView('form');
+}
+
+function showDetail(id) {
+  currentDetailId = id;
+  const week = db.weeks.find(w => w.id === id);
+  if (!week) return;
+  renderDetail(week);
+  showView('detail');
+}
+
+function editCurrentWeek() {
+  if (!currentDetailId) return;
+  editWeek(currentDetailId);
+}
+
+function editWeek(id) {
+  const week = db.weeks.find(w => w.id === id);
+  if (!week) return;
+  editingId = id;
+  document.getElementById('form-title').textContent = 'Modifier la semaine';
+  document.getElementById('delete-btn').style.display = 'inline-flex';
+  
+  document.getElementById('f-date').value = week.date || '';
+  document.getElementById('f-week-num').value = week.weekNum || '';
+  document.getElementById('f-mood').value = week.mood || '';
+  document.getElementById('f-notes').value = week.notes || '';
+
+  const s = getSettings();
+  const p = week.participants || [{}, {}];
+
+  document.getElementById('p0-done').value = p[0]?.done || '';
+  document.getElementById('p0-hard').value = p[0]?.hard || '';
+  renderObjList('p0-prev', p[0]?.prevObjs || []);
+  renderObjList('p0-next', p[0]?.nextObjs || []);
+
+  document.getElementById('p1-done').value = p[1]?.done || '';
+  document.getElementById('p1-hard').value = p[1]?.hard || '';
+  renderObjList('p1-prev', p[1]?.prevObjs || []);
+  renderObjList('p1-next', p[1]?.nextObjs || []);
+
+  switchParticipant(0);
+  updateTabNames();
+  showView('form');
+}
+
+// ============================================
+// RENDER HOME
+// ============================================
+function renderHome() {
+  const s = getSettings();
+  const weeks = [...db.weeks].sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+  document.getElementById('subtitle-text').textContent =
+    s.name1 + ' & ' + s.name2 + ' · ' + weeks.length + ' semaine' + (weeks.length > 1 ? 's' : '') + ' enregistrée' + (weeks.length > 1 ? 's' : '');
+
+  const list = document.getElementById('weeks-list');
+
+  if (weeks.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>Première réunion ?</h3>
+        <p>Commencez à suivre vos semaines ensemble.</p>
+        <button class="btn btn-accent" onclick="showNewForm()">+ Créer la première semaine</button>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = weeks.map(w => {
+    const p = w.participants || [{}, {}];
+    const allPrev = [...(p[0]?.prevObjs || []), ...(p[1]?.prevObjs || [])];
+    const done = allPrev.filter(o => o.checked).length;
+    const total = allPrev.length;
+    const pct = total > 0 ? Math.round(done / total * 100) : null;
+
+    const dateStr = w.date ? new Date(w.date + 'T12:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }) : '';
+    const preview = (p[0]?.done || p[1]?.done || 'Cliquez pour voir le détail').substring(0, 80);
+
+    return `
+      <div class="week-card" onclick="showDetail('${w.id}')">
+        <div class="week-number">${w.weekNum || '#'}</div>
+        <div class="week-info">
+          <div class="week-date">${dateStr} ${w.mood ? '· ' + w.mood : ''}</div>
+          <div class="week-preview">${preview}${preview.length === 80 ? '…' : ''}</div>
+          ${total > 0 ? `
+          <div class="week-stats">
+            <div class="week-stat"><div class="stat-dot" style="background: var(--green);"></div> ${done}/${total} objectifs</div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width: ${pct}%"></div></div>
+          ` : ''}
+        </div>
+        <div>
+          <div style="font-size: 18px; color: var(--ink-faint);">›</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ============================================
+// RENDER DETAIL
+// ============================================
+function renderDetail(week) {
+  const s = getSettings();
+  const p = week.participants || [{}, {}];
+  const dateStr = week.date ? new Date(week.date + 'T12:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
+
+  document.getElementById('d-week-num').textContent = week.weekNum || '';
+  document.getElementById('d-title').textContent = dateStr;
+  document.getElementById('d-mood').textContent = week.mood || '';
+
+  const allPrev = [...(p[0]?.prevObjs || []), ...(p[1]?.prevObjs || [])];
+  const done = allPrev.filter(o => o.checked).length;
+  if (allPrev.length > 0) {
+    document.getElementById('d-progress-text').textContent = done + '/' + allPrev.length + ' objectifs réalisés';
+  } else {
+    document.getElementById('d-progress-text').textContent = '';
+  }
+
+  const content = document.getElementById('detail-content');
+  const name1 = s.name1 || 'Participant 1';
+  const name2 = s.name2 || 'Participant 2';
+
+  function objsHTML(objs) {
+    if (!objs || objs.length === 0) return '<p style="font-size:14px; color: var(--ink-faint); font-style: italic;">Aucun objectif</p>';
+    return '<ul class="obj-list-detail">' + objs.map(o => `
+      <li>
+        <div class="obj-status-icon ${o.checked ? 'obj-done' : 'obj-pending'}">${o.checked ? '✓' : '·'}</div>
+        <span class="${o.checked ? 'obj-text-done' : ''}">${o.text || ''}</span>
+      </li>`).join('') + '</ul>';
+  }
+
+  function textCard(title, dot, text) {
+    return `<div class="detail-card">
+      <div class="detail-card-title"><div class="section-dot ${dot}"></div> ${title}</div>
+      <div class="detail-text ${!text ? 'empty' : ''}">${text || 'Rien de renseigné'}</div>
+    </div>`;
+  }
+
+  content.innerHTML = `
+    <!-- P1 -->
+    <div class="detail-card full">
+      <div class="detail-card-title" style="font-size: 16px; margin-bottom: 1.25rem;">
+        <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">${name1.charAt(0).toUpperCase()}</div>
+        ${name1}
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        ${textCard('Accompli cette semaine', 'dot-green', p[0]?.done)}
+        ${textCard('Points difficiles', 'dot-red', p[0]?.hard)}
+        <div style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          <div>
+            <div class="detail-card-title"><div class="section-dot dot-amber"></div> Objectifs passés</div>
+            ${objsHTML(p[0]?.prevObjs)}
+          </div>
+          <div>
+            <div class="detail-card-title"><div class="section-dot dot-blue"></div> Objectifs à venir</div>
+            ${objsHTML(p[0]?.nextObjs)}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P2 -->
+    <div class="detail-card full">
+      <div class="detail-card-title" style="font-size: 16px; margin-bottom: 1.25rem;">
+        <div style="width: 28px; height: 28px; border-radius: 50%; background: #EDE9FE; color: #7C3AED; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">${name2.charAt(0).toUpperCase()}</div>
+        ${name2}
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        ${textCard('Accompli cette semaine', 'dot-green', p[1]?.done)}
+        ${textCard('Points difficiles', 'dot-red', p[1]?.hard)}
+        <div style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          <div>
+            <div class="detail-card-title"><div class="section-dot dot-amber"></div> Objectifs passés</div>
+            ${objsHTML(p[1]?.prevObjs)}
+          </div>
+          <div>
+            <div class="detail-card-title"><div class="section-dot dot-blue"></div> Objectifs à venir</div>
+            ${objsHTML(p[1]?.nextObjs)}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    ${week.notes ? `
+    <div class="detail-card full">
+      <div class="detail-card-title"><div class="section-dot dot-purple"></div> Notes communes</div>
+      <div class="detail-text">${week.notes}</div>
+    </div>` : ''}
+  `;
+}
+
+// ============================================
+// FORM
+// ============================================
+function switchParticipant(idx) {
+  document.getElementById('form-p0').style.display = idx === 0 ? 'block' : 'none';
+  document.getElementById('form-p1').style.display = idx === 1 ? 'block' : 'none';
+  document.getElementById('tab-p1').classList.toggle('active', idx === 0);
+  document.getElementById('tab-p2').classList.toggle('active', idx === 1);
+}
+
+function updateTabNames() {
+  const s = getSettings();
+  document.getElementById('tab-p1-name').textContent = s.name1 || 'Participant 1';
+  document.getElementById('tab-p2-name').textContent = s.name2 || 'Participant 2';
+}
+
+function resetForm() {
+  ['p0-done', 'p0-hard', 'p1-done', 'p1-hard', 'f-notes'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f-mood').value = '';
+}
+
+// Objectives
+function renderObjList(key, objs) {
+  const container = document.getElementById(key + '-objs');
+  if (!container) return;
+  container.innerHTML = '';
+  objs.forEach((obj, i) => {
+    const div = document.createElement('div');
+    div.className = 'objective-item';
+    div.innerHTML = `
+      <input type="checkbox" ${obj.checked ? 'checked' : ''} onchange="toggleObj('${key}', ${i})">
+      <input type="text" value="${obj.text || ''}" placeholder="Objectif..." oninput="updateObj('${key}', ${i}, this.value)">
+      <button class="obj-delete" onclick="deleteObj('${key}', ${i})">×</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function getObjsFromDOM(key) {
+  const container = document.getElementById(key + '-objs');
+  if (!container) return [];
+  return Array.from(container.querySelectorAll('.objective-item')).map(item => ({
+    text: item.querySelector('input[type="text"]').value,
+    checked: item.querySelector('input[type="checkbox"]').checked
+  }));
+}
+
+function addObj(key, checked) {
+  const container = document.getElementById(key + '-objs');
+  const objs = getObjsFromDOM(key);
+  objs.push({ text: '', checked: checked || false });
+  renderObjList(key, objs);
+  // Focus last input
+  const inputs = container.querySelectorAll('input[type="text"]');
+  if (inputs.length) inputs[inputs.length - 1].focus();
+}
+
+function toggleObj(key, i) {
+  const objs = getObjsFromDOM(key);
+  if (objs[i]) objs[i].checked = !objs[i].checked;
+  renderObjList(key, objs);
+}
+
+function updateObj(key, i, val) {
+  // No re-render needed — live edit
+}
+
+function deleteObj(key, i) {
+  const objs = getObjsFromDOM(key);
+  objs.splice(i, 1);
+  renderObjList(key, objs);
+}
+
+function saveWeek() {
+  const week = {
+    id: editingId || Date.now().toString(),
+    date: document.getElementById('f-date').value,
+    weekNum: document.getElementById('f-week-num').value,
+    mood: document.getElementById('f-mood').value,
+    notes: document.getElementById('f-notes').value,
+    participants: [
+      {
+        done: document.getElementById('p0-done').value,
+        hard: document.getElementById('p0-hard').value,
+        prevObjs: getObjsFromDOM('p0-prev'),
+        nextObjs: getObjsFromDOM('p0-next'),
+      },
+      {
+        done: document.getElementById('p1-done').value,
+        hard: document.getElementById('p1-hard').value,
+        prevObjs: getObjsFromDOM('p1-prev'),
+        nextObjs: getObjsFromDOM('p1-next'),
+      }
+    ],
+    updatedAt: new Date().toISOString()
+  };
+
+  if (editingId) {
+    const idx = db.weeks.findIndex(w => w.id === editingId);
+    if (idx >= 0) db.weeks[idx] = week;
+  } else {
+    db.weeks.push(week);
+  }
+
+  save();
+  currentDetailId = week.id;
+  showDetail(week.id);
+}
+
+// ============================================
+// SETTINGS
+// ============================================
+function saveSettings() {
+  db.settings = {
+    name1: document.getElementById('s-name1').value || 'Arnaud',
+    name2: document.getElementById('s-name2').value || 'Maxime',
+  };
+  save();
+  showHome();
+}
+
+// ============================================
+// MODAL / CONFIRM
+// ============================================
+let pendingAction = null;
+
+function showModal(title, msg, action) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-msg').textContent = msg;
+  pendingAction = action;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  pendingAction = null;
+}
+
+document.getElementById('modal-confirm').onclick = () => {
+  if (pendingAction) pendingAction();
+  closeModal();
+};
+
+function confirmDelete() {
+  showModal('Supprimer cette semaine', 'Cette action est irréversible. Continuer ?', () => {
+    db.weeks = db.weeks.filter(w => w.id !== editingId);
+    save();
+    showHome();
+  });
+}
+
+function confirmClearAll() {
+  showModal('Effacer toutes les données', 'Toutes les semaines enregistrées seront supprimées définitivement.', () => {
+    db.weeks = [];
+    save();
+    showHome();
+  });
+}
+
+// ============================================
+// EXPORT / IMPORT
+// ============================================
+function exportData() {
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'weeklysync-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+}
+
+function importData() {
+  document.getElementById('import-file').click();
+}
+
+function handleImport(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.weeks) {
+        showModal('Importer des données', 'Fusionner avec les données existantes ou remplacer ?', () => {
+          // Merge by id
+          const existingIds = new Set(db.weeks.map(w => w.id));
+          data.weeks.forEach(w => { if (!existingIds.has(w.id)) db.weeks.push(w); });
+          if (data.settings) db.settings = data.settings;
+          save();
+          showHome();
+        });
+      }
+    } catch {
+      alert('Fichier invalide.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ============================================
+// UTILS
+// ============================================
+function getWeekNumber(d) {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+}
+
+// ============================================
+// INIT
+// ============================================
+renderHome();
+</script>
+</body>
+</html>
